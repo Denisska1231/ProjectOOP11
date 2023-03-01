@@ -1,0 +1,35 @@
+@import url("http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext");
+
+html,
+body {
+  background-color: #585c68;
+  padding: 0;
+  margin: 0;
+  font-family: "Lato", sans-serif;
+}
+
+a {
+  color: #353839;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+p {
+  font-family: "Lato", sans-serif;
+  font-size: large;
+  color: #353839;
+}
+
+a {
+  font-family: "Lato", sans-serif;
+  text-decoration: none;
+  color: #353839;
+  transition: 0.2s;
+}
