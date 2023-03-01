@@ -2,6 +2,7 @@ public class Dir {
     static String up() {
         return "up";
     }
+    
     static String down() {
         return "down";
     }
