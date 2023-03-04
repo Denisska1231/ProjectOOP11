@@ -1,0 +1,52 @@
+renovate Grammar เพื่อทำparser ใหม่และเพื่อให้สามารถติดต่อกับ Front End ได้ง่ายขึ้นไม่มากก็น้อย
+
+รูปแบบตัวเกมข้างต้น
+เริ่มมาเราจะได้เงินคนละ 10000 point 
+ช่องทุกช่องถูกเริ่มต้นมาด้วย 500 point หรือก็คือถ้าอยากจะยึด ต้องมีเงินเกิน500 pointเพื่อยึด
+คำสั่งต่างๆจะถูกเรียกใช้ด้วยการกดปุ่มในหน้าตัวเกม
+ถ้าเงินของผุ้เล่นคนไหนเป็น 0 จบเกมทันที
+
+-Expression เราจะขออนุมาน เป็นเงินของเกมนี้เลย
+
+
+Plan → Statement+
+ให้plan เป็นคำสั่งที่กดมาจาก ตัวเว็บเป็นปุ่มๆ เช่นเดิน โจมตี ลงทุนในพื้นที่ เก็บเงิน เป็นต้น -> แล้วส่งไปที่statement เพื่อเรียกคำสั่งอื่นๆ
+
+Statement ทำอะไร "Statement → Command | BlockStatement | IfStatement | WhileStatement"
+ความสามารถของ Statement 
+1. Command ตรงตามชื่อ"คำสั่ง" มีหน้าที่ส่งคำสั่ง "Command → AssignmentStatement | ActionCommand"
+	1.1 AssignmentStatement"AssignmentStatement → <identifier> = Expression"ในที่นี้เราจะให้มันทำงานเก็บค่าเงินของเราหลังเริ่มturn 
+	<identifier> เราจะใช้มันให้เป็น ตัวเก็บเงินหลังเริ่ม turn นั้นๆไปแล้ว เช่น M10524 ก็คือเงินหลังจากเริ่มturnนี้เหลือ 10524 จะมีผลเมื่อเราเวลาหมด การกระทำทุกอย่างจะ			ถูกลบออกแล้วเงินกลับมาเป็นเหมือนเดิม
+	1.2 ActionCommand ActionCommand → done | relocate | MoveCommand | RegionCommand | AttackCommand	
+	- done ทำหน้าที่จบ trun มี2กรณี 1.เวลาหมด 2.กดปุ่มในหน้าเว็บที่เป็นdoneแล้วส่งคำสั่งมาเรียกใช้
+	- relocate เรียกสั้นๆ "ย้ายบ้านหลัก" การทำงาน กดปุ่มในหน้าเว็บที่เป็นrelocate แล้วพิมเลขพื้นที่ที่ต้องการย้าย
+	- MoveCommand "MoveCommand → move Direction" 
+	  move Direction ทำหน้าที่อย่างไร การทำงาน กดปุ่มในหน้าเว็บที่เป็น move แล้วพิมเลขพื้นที่ที่ต้องการเดิน *เดินไปในโซนบ้านคนอื่นไม่ได้*
+	     เดินได้ตามนี้ "Direction → up | down | upleft | upright | downleft | downright"
+	- RegionCommand "RegionCommand → invest Expression | collect Expression"มี2คำสั้งข้างต้น 
+	  1.invest ขอเรียกมันว่าการซื้อเมือง การทำงาน *เหตุการสมมุติ* ถ้าจุดที่เราต้องการเดินไปข้างหน้าไม่มีเจ้าของ ให้กดปุ่มในหน้าเว็บที่เป็นinvest 
+	     แล้วพิมเลขพื้นที่ที่ต้องการซื้อ เพื่อนำมาเป็นของเรา
+	  2.collect ขอเรียกว่าเก้บภาษีหลังจากเริ่มturnของเรา เราสามารถให้กดปุ่มในหน้าเว็บที่เป็นcollect แล้วเพื่อเก้บภาษี/ดอกเบี้ยของทุกเมืองที่เราเป็นของเรา 
+	     *ใช้ได้แค่ครั้งเดียว* ต่อ1 trun ถ้าหากไม่เรียกใช้แต่ละเมืองที่เป้ยของเราจะถุกสบทบเงินเข้าไปเพื่อเก้บภาษีได้กีขึ้นในturnหน้า
+	- AttackCommand	"AttackCommand → shoot Direction Expression" หรือก็คือคำสั่งโจมตีคนอื่นด้วยเงินของเรา
+	     การทำงาน ขอปรับปรุงจากspecนิดหน่อย กดปุ่มในหน้าเว็บที่เป็น shoot แล้วพิมเลขพื้นที่ที่ต้องการยิง *ยิงไปไหนก็ได้*
+	     การยิงมีการเป็นไปได้อยู่2กรณี
+	  1.ยิงพื้นที่ปกติ พื้นที่ที่ถูกยิงถ้ามีเจ้าของ ค่าpoint ของคนยืงจะถูกลบตามราคาของพื้นที่นั้น 
+	        ถ้ามากกว่าพื้นที่นั้นจะกลายเป็นว่าง แล้วการที่จะซื้อได้ก็คือ 500 เหมือนเดิม
+	        ถ้าน้อยกว่าพื้นที่นั้นจะกลายจะถูกลบ ตามpoint ของผุ้เล่นที่ยิงไป หลังจากนั้นก้ GAME OVER เพราะเงินเป็น 0
+	  2.ยิงพื้นที่ที่เป็นบ้านของคนอื่น การที่จะยิงบ้านของคนอื่นได้ต้องมีpointมากกว่าบ้านของผุ้เล่นตรงข้ามนั้น 1.5 เท่า
+
+Expression → Expression + Term | Expression - Term | Term
+Term → Term * Factor | Term / Factor | Term % Factor | Factor
+Factor → Power ^ Factor | Power
+Power → <number> | <identifier> | ( Expression ) | InfoExpression
+
+(ขอปิดการใช้งานไปก่อนเนื่องจาก ความสามารถไม่พอ)
+InfoExpression → opponent | nearby Direction
+BlockStatement → { Statement* }
+IfStatement → if ( Expression ) then Statement else Statement
+WhileStatement → while ( Expression ) Statement
+
+สิ่งที่จะมาพัฒนาทีหลัง 
+-InfoExpression → opponent | nearby Direction
+-การจับเวลา
