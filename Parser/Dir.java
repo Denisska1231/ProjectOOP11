@@ -1,20 +1,38 @@
 public class Dir {
-    static String up() {
+    static String shootup() {
         return "up";
     }
-    static String down() {
+    static String shootdown() {
         return "down";
     }
-    static String upleft() {
+    static String shootupleft() {
         return "upleft";
     }
-    static String upright() {
+    static String shootupright() {
         return "up";
     }
-    static String downleft() {
+    static String shootdownleft() {
         return "downleft";
     }
-    static String downright() {
+    static String shootdownright() {
+        return "downright";
+    }
+    static String moveup() {
+        return "up";
+    }
+    static String movedown() {
+        return "down";
+    }
+    static String moveupleft() {
+        return "upleft";
+    }
+    static String moveupright() {
+        return "up";
+    }
+    static String movedownleft() {
+        return "downleft";
+    }
+    static String movedownright() {
         return "downright";
     }
 }

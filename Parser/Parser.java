@@ -1,193 +1,160 @@
 import java.util.*;
+import java.util.ArrayList;
 public class Parser {
-    private final Tokenizer tkz;
-    public Parser(Tokenizer tkz) {
-        this.tkz = tkz;
+    private Tokenizer tkz;
+    List<String> command = List.of("done", "relocate", "move", "invest", "collect", "shoot");
+    List<String> specialVariables = List.of("if", "while", "done", "relocate", "move", "invest", "shoot", "up", "down", "upleft", "upright", "downleft", "downright", "if", "while", "then", "else", "opponent", "nearby", "rows", "cols", "currow", "curcol", "budget", "deposit", "int", "maxdeposit", "random");
+    List<String> reservedWords = List.of("collect","done","down",
+            "downleft","downright","else","if","invest","move","nearby","opponent",
+            "relocate","shoot","then","up","upleft","upright","while");
+
+    public Parser() {
     }
 
-
-    public String parse() throws SyntaxError {
-        try{
-            String ans = Plan();
-            if(tkz.hasNextToken()) throw new SyntaxError("token is not null : " + tkz.peek());
-            return ans;
-        }catch (SyntaxError e){
-            throw new SyntaxError(e.getMessage());
-        }
-    }
-    private String Plan() throws SyntaxError{
-        try{
-            String v = Statement();
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e){
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node Plan() throws SyntaxError{
+        Node v = Statement();
+        return v;
     }
 
-    private String Statement() throws SyntaxError{
-        String v = "";
-        try{
-            if (tkz.hasNextToken() && (tkz.peek("Command"))){
-                tkz.consume();
-                v = Command();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("BlockStatement"))){
+    private Node Statement() throws SyntaxError{
+        Node v = Command();
+            if (tkz.hasNextToken() && (tkz.peek("{"))){
                 tkz.consume();
                 v = BlockStatement();
             }
-            if (tkz.hasNextToken() && (tkz.peek("IfStatement"))){
+            if (tkz.hasNextToken() && (tkz.peek("if"))){
                 tkz.consume();
                 v = IfStatement();
             }
-            if (tkz.hasNextToken() && (tkz.peek("WhileStatement"))){
+            if (tkz.hasNextToken() && (tkz.peek("while"))){
                 tkz.consume();
                 v = WhileStatement();
             }
             return v;
-
-        } catch (IllegalArgumentException | NoSuchElementException e){
-            throw new SyntaxError(e.getMessage());
-        }
     }
 
-    private String Command() throws SyntaxError {
-        String v = "";
-        try {
-            if (tkz.hasNextToken() && (tkz.peek("AssignmentStatement"))) {
-                tkz.consume();
-               v = AssignmentStatement();
+    private Node Command() throws SyntaxError {
+        if(command.contains(tkz.peek())){
+            return ActionCommand();
+        }
+        return AssignmentStatement();
+    }
+
+    private Node AssignmentStatement() throws SyntaxError {
+        String identifier = tkz.consume();
+        long expr = Expression();
+        if (tkz.peek("=")) {
+            tkz.consume();
+        }
+        return (Node) new AssignStatement(identifier, expr);
+    }
+    private Node ActionCommand() throws SyntaxError{
+        Node v = null;
+            if (tkz.hasNextToken() && (tkz.peek("done"))) {
+                v = Done();
             }
-            if (tkz.hasNextToken() && (tkz.peek("ActionCommand"))) {
-                tkz.consume();
-                v = ActionCommand();
+            if (tkz.hasNextToken() && (tkz.peek("relocate"))) {
+                v = Relocate();
             }
-            return v;
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
-    }
+            if (tkz.hasNextToken() && (tkz.peek("move"))) {
+                v = Move();
+            }
+            if (tkz.hasNextToken() && (tkz.peek("invest"))) {
+            v = Invest();
+            }
+            if (tkz.hasNextToken() && (tkz.peek("collect"))) {
+                v = Collect();
+            }
+            if (tkz.hasNextToken() && (tkz.peek("shoot"))) {
+                v = Shoot();
+            }
 
-    private int AssignmentStatement() throws SyntaxError {
-        int v = Expression();
-        try {
-        return v;
-
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
-    }
-        private String ActionCommand() throws SyntaxError{
-            String v = "";
-            try {
-                if (tkz.hasNextToken() && (tkz.peek("shoot"))) {
-                    v = shoot(Direction());
-
-                }
                 return v;
 
-            }catch (IllegalArgumentException | NoSuchElementException e) {
-                throw new SyntaxError(e.getMessage());
-            }
-        }
 
+    }
+    private Node Done(){
+        return null;
+    }
+    private Node Relocate(){
+        return null;
+    }
+    public Node Shoot() {
+        String shootdir = tkz.consume();
+        if (Objects.equals(shootdir, "up")) {
+            Dir.shootup();
+        }
+        if (Objects.equals(shootdir, "down")) {
+            Dir.shootdown();
+        }
+        if (Objects.equals(shootdir, "up")) {
+            Dir.shootupleft();
+        }
+        if (Objects.equals(shootdir, "upright")) {
+            Dir.shootupright();
+        }
+        if (Objects.equals(shootdir, "downleft")) {
+            Dir.shootdownleft();
+        }
+        if (Objects.equals(shootdir, "downright")) {
+            Dir.shootdownright();
+        }
+        return null;
+    }
+    private Node Move() throws SyntaxError{
+       String movedir = tkz.consume();
+        if (Objects.equals(movedir, "up")) {
+            Dir.moveup();
+        }
+        if (Objects.equals(movedir, "down")) {
+            Dir.movedown();
+        }
+        if (Objects.equals(movedir, "up")) {
+            Dir.moveupleft();
+        }
+        if (Objects.equals(movedir, "upright")) {
+            Dir.moveupright();
+        }
+        if (Objects.equals(movedir, "downleft")) {
+            Dir.movedownleft();
+        }
+        if (Objects.equals(movedir, "downright")) {
+            Dir.movedownright();
+        }
+        return null;
+    }
 
-    private String MoveCommand() throws SyntaxError{
-        String v = Direction();
-        try{
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node Invest(){
+        long expr = Expression();
+        return (Node) new Invest(expr);
     }
-    private String RegionCommand() throws SyntaxError{
-        String v = "";
-        try{
-            if (tkz.hasNextToken() && (tkz.peek("invest"))) {
-                v = invest(Expression());
-            }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node Collect(){
+        long expr = Expression();
+        return (Node) new Collect(expr);
     }
-    private boolean AttackCommand() throws SyntaxError{
-        boolean v = false;
-        try{
-            if (tkz.hasNextToken() && (tkz.peek("shoot"))) {
-                tkz.consume();
-                v = shoot(Direction());
-            }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node BlockStatement() throws SyntaxError{
+        Node v = Statement();
+        tkz.consume("}");
+        return v;
     }
-    private String Direction() throws SyntaxError {
-        String v ="";
-        try{
-            if (tkz.hasNextToken() && (tkz.peek("up"))) {
-                tkz.consume();
-                v = Dir.up();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("down"))) {
-                tkz.consume();
-                v = Dir.down();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("upleft"))) {
-                tkz.consume();
-                v = Dir.upleft();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("upright"))) {
-                tkz.consume();
-                v = Dir.upright();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("downleft"))) {
-                tkz.consume();
-                v = Dir.downleft();
-            }
-            if (tkz.hasNextToken() && (tkz.peek("downright"))) {
-                tkz.consume();
-                v = Dir.downright();
-            }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node IfStatement() throws SyntaxError{
+        tkz.consume("(");
+        long expr = Expression();
+        tkz.consume(")");
+        tkz.consume("then");
+        Node Then = Statement();
+        tkz.consume("else");
+        Node Else = Statement();
+        return (Node) new If( expr, Then, Else );
     }
-    private String BlockStatement() throws SyntaxError{
-        String v = Statement();
-        try{
-            tkz.consume();
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+    private Node WhileStatement() throws SyntaxError{
+        tkz.consume("(");
+        long expr = Expression();
+        tkz.consume(")");
+        Node Do = Statement();
+        return (Node) new While( expr, Do );
     }
-    private String IfStatement() throws SyntaxError{
-        String v = "";
-        try{
-            if(Expression()){
-                v = Statement();
-            }else{
-                v = Statement();
-            }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
-    }
-    private String WhileStatement() throws SyntaxError{
-        String v = "";
-        try{
-            while (Expression()){
-                v = Statement();
-            }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
-    }
-    private int Expression()throws SyntaxError{
+    private long Expression()throws SyntaxError{
         int v = Term();
         try{
             while (tkz.hasNextToken() && (tkz.peek("+") || tkz.peek("-"))){
@@ -270,12 +237,6 @@ public class Parser {
             return v;
         }catch (IllegalArgumentException | NoSuchElementException e) {
             throw new SyntaxError(e.getMessage());
-        }
-    }
-    private String shoot(String direction) {
-        String dir ;
-        if (direction = "up") {
-            return "up";
         }
     }
 }
