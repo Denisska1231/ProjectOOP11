@@ -1,4 +1,6 @@
+package ProjectOOP11.Parser;
+
 public class Collect {
-    public Collect(long expr) {
+    public Collect(Expr expr) {
     }
 }

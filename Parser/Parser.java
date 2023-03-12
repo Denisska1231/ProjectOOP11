@@ -1,5 +1,7 @@
+package ProjectOOP11.Parser;
+
 import java.util.*;
-import java.util.ArrayList;
+
 public class Parser {
     private Tokenizer tkz;
     List<String> command = List.of("done", "relocate", "move", "invest", "collect", "shoot");
@@ -7,8 +9,8 @@ public class Parser {
     List<String> reservedWords = List.of("collect","done","down",
             "downleft","downright","else","if","invest","move","nearby","opponent",
             "relocate","shoot","then","up","upleft","upright","while");
-
-    public Parser() {
+    public Parser(Tokenizer tkz) {
+        this.tkz = tkz;
     }
 
     private Node Plan() throws SyntaxError{
@@ -42,7 +44,7 @@ public class Parser {
 
     private Node AssignmentStatement() throws SyntaxError {
         String identifier = tkz.consume();
-        long expr = Expression();
+        Expr expr = Expression();
         if (tkz.peek("=")) {
             tkz.consume();
         }
@@ -125,11 +127,11 @@ public class Parser {
     }
 
     private Node Invest(){
-        long expr = Expression();
+        Expr expr = Expression();
         return (Node) new Invest(expr);
     }
     private Node Collect(){
-        long expr = Expression();
+        Expr expr = Expression();
         return (Node) new Collect(expr);
     }
     private Node BlockStatement() throws SyntaxError{
@@ -139,7 +141,7 @@ public class Parser {
     }
     private Node IfStatement() throws SyntaxError{
         tkz.consume("(");
-        long expr = Expression();
+       Expr expr = Expression();
         tkz.consume(")");
         tkz.consume("then");
         Node Then = Statement();
@@ -149,68 +151,67 @@ public class Parser {
     }
     private Node WhileStatement() throws SyntaxError{
         tkz.consume("(");
-        long expr = Expression();
+        Expr expr = Expression();
         tkz.consume(")");
         Node Do = Statement();
         return (Node) new While( expr, Do );
     }
-    private long Expression()throws SyntaxError{
+    private Expr Expression()throws SyntaxError{
+        Expr left = Term();
             while (tkz.hasNextToken() && (tkz.peek("+") || tkz.peek("-"))){
                 if(tkz.peek("+")){
                     String op = tkz.consume();
-                    Node.ExprNode right = Term();
+                    Expr right = Term();
                     left = new BinaryArithExpr( left, op, right );
                 } else if (tkz.peek("-")) {
                     String op = tkz.consume();
-                    Node.ExprNode right = Term();
+                    Expr right = Term();
                     left = new BinaryArithExpr( left, op, right );
                 }
             }
             return left;
     }
-    private long Term() throws SyntaxError{
-        try{
-            int v = Factor();
-            while (tkz.hasNextToken() &&(tkz.peek("*") || tkz.peek("/") || tkz.peek("%"))){
-                if(tkz.peek("*")){
-                    tkz.consume();
-                    v *= Factor();
-                } else if (tkz.peek("/")) {
-                    tkz.consume();
-                    v /= Factor();
-                } else if (tkz.peek("%")) {
-                    tkz.consume();
-                    v %= Factor();
-                }
+    private Expr Term() throws SyntaxError{
+        Expr left = Factor();
+        while (tkz.hasNextToken() && (tkz.peek("*") || tkz.peek("/")) || tkz.peek("%")){
+            if(tkz.peek("+")){
+                String op = tkz.consume();
+                Expr right = Term();
+                left = new BinaryArithExpr( left, op, right );
             }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e){
-            throw new SyntaxError(e.getMessage());
-        }
-    }
-    private int Factor()throws SyntaxError{
-        int v = Power();
-        try{
-            while (tkz.hasNextToken() && (tkz.peek("^"))){
-                if(tkz.peek("^")){
-                    tkz.consume();
-                    v ^= Term();
-                }
+            if (tkz.peek("/")) {
+                String op = tkz.consume();
+                Expr right = Term();
+                left = new BinaryArithExpr( left, op, right );
             }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
+            if (tkz.peek("%")) {
+                String op = tkz.consume();
+                Expr right = Term();
+                left = new BinaryArithExpr( left, op, right );
+            }
         }
+        return left;
     }
-    private int Power() throws SyntaxError{
-        int v = InfoExpression();
-        try{
+    private Expr Factor()throws SyntaxError {
+        Expr left = Power();
+        while (tkz.hasNextToken() && (tkz.peek("^"))) {
+            if (tkz.peek("^")) {
+                String op = tkz.consume();
+                Expr right = Term();
+                left = new BinaryArithExpr(left, op, right);
+            }
+        }
+        return left;
+    }
+    private Expr Power() throws SyntaxError{
+        Expr v = InfoExpression();
+
             if(Character.isDigit(tkz.peek().charAt(0))){
-                return  Integer.parseInt(tkz.consume());
+                return (Expr) new Digit(Long.parseLong(tkz.consume()));
             }
             if(tkz.hasNextToken() && (tkz.peek("identifier"))){
                 tkz.consume();
-                v = identifier();
+                v = (Expr) new Identifier(tkz.consume());
             }
             while (tkz.hasNextToken() && (tkz.peek("(") || tkz.peek(")"))){
                     tkz.consume("(");
@@ -218,22 +219,15 @@ public class Parser {
                     tkz.consume(")");
                 }
             return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
     }
-    private String InfoExpression() throws SyntaxError{
-        String v = "";
-        try{
+    private Expr InfoExpression() throws SyntaxError{
+        Expr Info = null;
             if(tkz.hasNextToken() && (tkz.peek("opponent"))){
-                v = opponent();
+                Info = (Expr) new Opponent();
             }
             if(tkz.hasNextToken() && (tkz.peek("opponent"))){
-                v = nearby(Direction());
+                Info = (Expr) new Nearby();
             }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+        return Info;
     }
 }

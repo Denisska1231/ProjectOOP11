@@ -1,5 +1,7 @@
+package ProjectOOP11.Parser;
+
 public class Invest {
-    public  Invest(long expr) {
+    public  Invest(Expr expr) {
 
     }
 }

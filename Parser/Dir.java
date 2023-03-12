@@ -1,3 +1,5 @@
+package ProjectOOP11.Parser;
+
 public class Dir {
     static String shootup() {
         return "up";

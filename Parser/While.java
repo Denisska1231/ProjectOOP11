@@ -1,4 +1,6 @@
+package ProjectOOP11.Parser;
+
 public class While {
-    public While(long expr, Node aDo) {
+    public While(Expr expr, Node aDo) {
     }
 }

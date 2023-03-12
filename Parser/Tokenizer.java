@@ -1,3 +1,5 @@
+package ProjectOOP11.Parser;
+
 import java.util.NoSuchElementException;
 
 public interface Tokenizer {
