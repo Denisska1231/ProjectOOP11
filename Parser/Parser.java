@@ -155,23 +155,20 @@ public class Parser {
         return (Node) new While( expr, Do );
     }
     private long Expression()throws SyntaxError{
-        int v = Term();
-        try{
             while (tkz.hasNextToken() && (tkz.peek("+") || tkz.peek("-"))){
                 if(tkz.peek("+")){
-                    tkz.consume();
-                    v += Term();
+                    String op = tkz.consume();
+                    Node.ExprNode right = Term();
+                    left = new BinaryArithExpr( left, op, right );
                 } else if (tkz.peek("-")) {
-                    tkz.consume();
-                    v -= Term();
+                    String op = tkz.consume();
+                    Node.ExprNode right = Term();
+                    left = new BinaryArithExpr( left, op, right );
                 }
             }
-            return v;
-        }catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new SyntaxError(e.getMessage());
-        }
+            return left;
     }
-    private int Term() throws SyntaxError{
+    private long Term() throws SyntaxError{
         try{
             int v = Factor();
             while (tkz.hasNextToken() &&(tkz.peek("*") || tkz.peek("/") || tkz.peek("%"))){
