@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
     Parser a = new Parser(new ExprTokenizer("up"));
-    Parser d = new Parser(new ExprTokenizer("ss"));
+    Parser d = new Parser(new ExprTokenizer("move up"));
     Parser b = new Parser(new ExprTokenizer("2^5^2"));
     Parser e = new Parser(new ExprTokenizer("(2^5)^2"));
     Parser f = new Parser(new ExprTokenizer("100/20"));
