@@ -1,6 +1,17 @@
 package ProjectOOP11.Parser;
 
-public class Dir {
+public class Dir implements Node {
+    public static Dir Down;
+    public String expr;
+    public String movedir;
+
+    public Dir(String movedir) {
+        this.movedir = movedir;
+    }
+
+    public String Direc() {
+        return movedir;
+    }
     static String shootup() {
         return "up";
     }

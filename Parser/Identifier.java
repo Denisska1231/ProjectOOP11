@@ -1,10 +1,11 @@
 package ProjectOOP11.Parser;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Identifier implements Expression {
+class Identifier implements Expr {
     private final String name;
     static List<String> reservedWords = List.of("collect","done","down",
             "downleft","downright","else","if","invest","move","nearby","opponent",
@@ -22,5 +23,10 @@ class Identifier implements Expression {
         boolean isReserved = reservedWords.contains(name);
         boolean illegalGeneral = !matcher.matches();
         return !(isEmpty || isReserved || illegalGeneral);
+    }
+
+    @Override
+    public long eval(Map<String, Long> bindings) throws EvalError {
+        return 0;
     }
 }

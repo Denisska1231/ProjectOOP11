@@ -1,8 +1,17 @@
 package ProjectOOP11.Parser;
 
-public class Nearby {
-    private Expr Nearby() throws SyntaxError{
-        Expr v = null;
-        return v;
+import ProjectOOP11.GameState.Game;
+
+import java.util.Map;
+
+public class Nearby implements Expr{
+    private final Direction direction;
+
+    public Nearby(Direction direction) {
+        this.direction = direction;
+    }
+    @Override
+    public long eval(Map<String, Long> bindings) throws EvalError {
+        return 0;
     }
 }
