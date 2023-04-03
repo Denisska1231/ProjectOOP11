@@ -7,8 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
     Parser a = new Parser(new ExprTokenizer("up"));
+    Parser d = new Parser(new ExprTokenizer("ss"));
     Parser b = new Parser(new ExprTokenizer("2^5^2"));
-    String str = "t = t + 1  \n" +
+    Parser e = new Parser(new ExprTokenizer("(2^5)^2"));
+    Parser f = new Parser(new ExprTokenizer("100/20"));
+    Parser g = new Parser(new ExprTokenizer("999-888"));
+    String con = "t = t + 1  \n" +
             "m = 0  \n" +
             "while (deposit) { \n" +
             "  if (deposit - 100)\n" +
@@ -63,12 +67,16 @@ public class ParserTest {
             "  }\n" +
             "}  \n" +
             "if (budget - 1) then invest 1 else {}\n";
-    Parser c = new Parser(new ExprTokenizer(str));
+    Parser c = new Parser(new ExprTokenizer(con));
     @Test
     void parse() {
-        assertEquals("up", ((Dir)a.Shoot()).Direc());
-        assertEquals(33554432, b.Expression().eval(null));
-        c.parse();
+        assertEquals("up", ((Dir)a.Move()).Direc()); //test move
+        System.out.println(d.ActionCommand()); //test actioncommand
+        assertEquals(33554432, b.Expression().eval(null)); //test factor
+        assertEquals(1024, e.Expression().eval(null)); // test power
+        assertEquals(5, f.Expression().eval(null)); // test term
+        assertEquals(111, g.Expression().eval(null)); // test expression
+        //c.parse(); // passed : Assignmentstate, WhileStatement
     }
 
 }

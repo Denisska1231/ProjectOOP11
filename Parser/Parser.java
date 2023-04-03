@@ -15,7 +15,7 @@ public class Parser {
     }
     public List<Node> parse() {
         List<Node> v = Plan();
-        if(tkz.hasNextToken()) throw new EvalError.CommandHasLeftoverToken(tkz.peek());
+        if(tkz.hasNextToken()) throw new EvalError.LeftOverToken(tkz.peek());
         return v;
     }
 
@@ -63,7 +63,7 @@ public class Parser {
         Expr expr = Expression();
         return new AssignState(identifier, expr);
     }
-    private Node ActionCommand() throws SyntaxError{
+    Node ActionCommand() throws SyntaxError{
         Node v = null;
             if (tkz.hasNextToken() && (tkz.peek("done"))) {
                 v = new Done();
@@ -123,7 +123,7 @@ public class Parser {
     }
     public Node Move() throws SyntaxError{
         String movedir = tkz.consume();
-        if (Objects.equals(movedir, "move up")) {
+        if (Objects.equals(movedir, "up")) {
             movedir = Dir.moveup();
         }
         if (Objects.equals(movedir, "down")) {
